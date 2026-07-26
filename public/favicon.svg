@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="400" height="400" viewBox="0 0 400 400"
+     xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Vaelaire V monogram</title>
+  <desc id="desc">Vaelaire stylized V monogram with diagonal gold accent. Use as app icon, favicon and social profile image.</desc>
+
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2D18A"/>
+      <stop offset="45%" stop-color="#C99B43"/>
+      <stop offset="100%" stop-color="#8E6420"/>
+    </linearGradient>
+  </defs>
+
+  <!-- V monogram scaled 1.15× and centered on 400×400 canvas -->
+  <!-- Bounding box of paths: x∈[-128,150] y∈[-96,86]; center ≈ (11,−5) in local coords -->
+  <g transform="translate(187, 206) scale(1.15)">
+
+    <!-- Left blade -->
+    <path d="M -128 -78
+             C -96 -76, -76 -57, -58 -27
+             L 0 86
+             L 26 48
+             L -37 -51
+             C -58 -83, -88 -96, -128 -78 Z"
+          fill="#151922"/>
+
+    <!-- Inner contour depth hints -->
+    <path d="M -95 -68
+             C -75 -60, -58 -42, -42 -17
+             L 3 62"
+          fill="none" stroke="#343946" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -78 -60
+             C -61 -49, -49 -34, -35 -13
+             L 9 52"
+          fill="none" stroke="#242934" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Right blade -->
+    <path d="M 8 86
+             L 92 -51
+             C 108 -77, 125 -91, 150 -96
+             L 35 79 Z"
+          fill="#151922"/>
+
+    <!-- Gold diagonal accent -->
+    <path d="M 50 -1
+             C 78 -61, 104 -87, 150 -96
+             C 115 -66, 84 -26, 50 18 Z"
+          fill="url(#gold)"/>
+  </g>
+</svg>

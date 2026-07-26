@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="760" height="140" viewBox="0 0 760 140"
+     xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Vaelaire horizontal logo lockup</title>
+  <desc id="desc">Vaelaire horizontal lockup with V monogram and wordmark side by side. Use for website headers and narrow layouts.</desc>
+
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2D18A"/>
+      <stop offset="45%" stop-color="#C99B43"/>
+      <stop offset="100%" stop-color="#8E6420"/>
+    </linearGradient>
+  </defs>
+
+  <!-- V monogram at 0.55× scale, vertically centred -->
+  <!-- Absolute bounds at this scale: x≈34–187, y≈20–120 -->
+  <g transform="translate(104, 73) scale(0.55)">
+
+    <!-- Left blade -->
+    <path d="M -128 -78
+             C -96 -76, -76 -57, -58 -27
+             L 0 86
+             L 26 48
+             L -37 -51
+             C -58 -83, -88 -96, -128 -78 Z"
+          fill="#151922"/>
+
+    <!-- Inner contour depth hints -->
+    <path d="M -95 -68
+             C -75 -60, -58 -42, -42 -17
+             L 3 62"
+          fill="none" stroke="#343946" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -78 -60
+             C -61 -49, -49 -34, -35 -13
+             L 9 52"
+          fill="none" stroke="#242934" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Right blade -->
+    <path d="M 8 86
+             L 92 -51
+             C 108 -77, 125 -91, 150 -96
+             L 35 79 Z"
+          fill="#151922"/>
+
+    <!-- Gold diagonal accent -->
+    <path d="M 50 -1
+             C 78 -61, 104 -87, 150 -96
+             C 115 -66, 84 -26, 50 18 Z"
+          fill="url(#gold)"/>
+  </g>
+
+  <!-- Thin vertical gold divider -->
+  <line x1="210" y1="22" x2="210" y2="118" stroke="#C99B43" stroke-width="1.5"/>
+
+  <!-- Wordmark -->
+  <text x="228" y="96"
+        fill="#111318"
+        font-family="Didot, 'Bodoni MT', 'Times New Roman', serif"
+        font-size="72"
+        font-weight="400"
+        letter-spacing="7">VAELAIRE</text>
+</svg>

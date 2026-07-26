@@ -3,25 +3,74 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F6F2EA;
+  --foreground: #25282D;
+  --color-midnight: #0B1320;
+  --color-champagne: #D6B98C;
+  --color-ivory: #F6F2EA;
+  --color-stone: #B7B0A5;
+  --color-sage: #66756B;
+  --color-charcoal: #25282D;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #0B1320;
+    --foreground: #F6F2EA;
   }
 }
 
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+/* Accessibility: Skip to main content */
+.skip-link {
+  @apply absolute -top-10 left-0 bg-midnight text-ivory px-4 py-2 z-[100] transition-all duration-300;
+}
+
+.skip-link:focus {
+  @apply top-0;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@layer base {
+  body {
+    @apply bg-ivory text-charcoal antialiased;
+  }
+
+  /* Editorial headings default */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-editorial;
+  }
+
+  /* Focus states for accessibility */
+  :focus-visible {
+    @apply outline-2 outline-champagne outline-offset-2;
+  }
+
+  /* Custom selection colors */
+  ::selection {
+    @apply bg-champagne text-midnight;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+}
+
+/* Smooth scrolling (respects reduced motion) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
   }
 }

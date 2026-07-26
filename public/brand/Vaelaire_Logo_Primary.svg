@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="640" viewBox="370 110 800 640"
+     xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Vaelaire logo</title>
+  <desc id="desc">Luxury boutique hotel logo with a stylized V monogram, Vaelaire wordmark, and Stay at Vaelaire signature line.</desc>
+
+  <defs>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F2D18A"/>
+      <stop offset="45%" stop-color="#C99B43"/>
+      <stop offset="100%" stop-color="#8E6420"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Stylized V monogram -->
+  <g transform="translate(768 260)">
+    <!-- Left blade -->
+    <path d="M -128 -78
+             C -96 -76, -76 -57, -58 -27
+             L 0 86
+             L 26 48
+             L -37 -51
+             C -58 -83, -88 -96, -128 -78 Z"
+          fill="#151922"/>
+    <!-- Inner contour -->
+    <path d="M -95 -68
+             C -75 -60, -58 -42, -42 -17
+             L 3 62"
+          fill="none" stroke="#343946" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -78 -60
+             C -61 -49, -49 -34, -35 -13
+             L 9 52"
+          fill="none" stroke="#242934" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Right blade -->
+    <path d="M 8 86
+             L 92 -51
+             C 108 -77, 125 -91, 150 -96
+             L 35 79 Z"
+          fill="#151922"/>
+
+    <!-- Gold accent -->
+    <path d="M 50 -1
+             C 78 -61, 104 -87, 150 -96
+             C 115 -66, 84 -26, 50 18 Z"
+          fill="url(#gold)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="768" y="608"
+        text-anchor="middle"
+        fill="#111318"
+        font-family="Didot, 'Bodoni MT', 'Times New Roman', serif"
+        font-size="118"
+        font-weight="400"
+        letter-spacing="9">VAELAIRE</text>
+
+  <!-- Signature line -->
+  <line x1="422" y1="678" x2="530" y2="678" stroke="url(#gold)" stroke-width="3"/>
+  <line x1="1006" y1="678" x2="1114" y2="678" stroke="url(#gold)" stroke-width="3"/>
+
+  <text x="768" y="694"
+        text-anchor="middle"
+        fill="#151922"
+        font-family="Helvetica Neue, Arial, sans-serif"
+        font-size="34"
+        font-weight="500"
+        letter-spacing="8">STAY AT VAELAIRE</text>
+</svg>

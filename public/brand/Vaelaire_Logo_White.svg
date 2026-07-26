@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="800" height="640" viewBox="370 110 800 640"
+     xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Vaelaire logo — white reversed</title>
+  <desc id="desc">White reversed variant of the Vaelaire logo for use on dark and coloured backgrounds. Remove the background rect when placing on a branded surface.</desc>
+
+  <!-- Dark background for context — strip this rect when placing on a branded dark surface -->
+  <rect x="370" y="110" width="800" height="640" fill="#111318"/>
+
+  <!-- V monogram — blades white, gold accent retained for mark identity -->
+  <g transform="translate(768 260)">
+
+    <!-- Left blade -->
+    <path d="M -128 -78
+             C -96 -76, -76 -57, -58 -27
+             L 0 86
+             L 26 48
+             L -37 -51
+             C -58 -83, -88 -96, -128 -78 Z"
+          fill="#FFFFFF"/>
+
+    <!-- Inner contour depth hints at low opacity -->
+    <path d="M -95 -68
+             C -75 -60, -58 -42, -42 -17
+             L 3 62"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.15" stroke-width="5" stroke-linecap="round"/>
+    <path d="M -78 -60
+             C -61 -49, -49 -34, -35 -13
+             L 9 52"
+          fill="none" stroke="#FFFFFF" stroke-opacity="0.10" stroke-width="4" stroke-linecap="round"/>
+
+    <!-- Right blade -->
+    <path d="M 8 86
+             L 92 -51
+             C 108 -77, 125 -91, 150 -96
+             L 35 79 Z"
+          fill="#FFFFFF"/>
+
+    <!-- Gold accent — retained to preserve mark personality against the white blades -->
+    <path d="M 50 -1
+             C 78 -61, 104 -87, 150 -96
+             C 115 -66, 84 -26, 50 18 Z"
+          fill="#F2D18A"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="768" y="608"
+        text-anchor="middle"
+        fill="#FFFFFF"
+        font-family="Didot, 'Bodoni MT', 'Times New Roman', serif"
+        font-size="118"
+        font-weight="400"
+        letter-spacing="9">VAELAIRE</text>
+
+  <!-- Signature lines — warm gold to maintain brand warmth on dark -->
+  <line x1="422" y1="678" x2="530" y2="678" stroke="#C99B43" stroke-width="3"/>
+  <line x1="1006" y1="678" x2="1114" y2="678" stroke="#C99B43" stroke-width="3"/>
+
+  <!-- Signature phrase -->
+  <text x="768" y="694"
+        text-anchor="middle"
+        fill="#FFFFFF"
+        font-family="Helvetica Neue, Arial, sans-serif"
+        font-size="34"
+        font-weight="500"
+        letter-spacing="8">STAY AT VAELAIRE</text>
+</svg>
