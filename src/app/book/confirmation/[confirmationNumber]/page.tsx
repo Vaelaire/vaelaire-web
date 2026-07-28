@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { SiteHeader, SiteFooter } from "@/components/layout";
 import { BookingConfirmation } from "@/components/booking";
 import { graphqlClient } from "@/lib/graphql/client";
@@ -10,7 +10,10 @@ import type { Booking } from "@/lib/graphql/types";
 
 export default function ConfirmationPage() {
   const params = useParams();
+  const searchParams = useSearchParams();
   const confirmationNumber = params.confirmationNumber as string;
+  // Stripe appends redirect_status=succeeded to the return_url on successful payment
+  const stripeRedirectStatus = searchParams.get("redirect_status") ?? undefined;
   const [booking, setBooking] = useState<Booking | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -125,7 +128,9 @@ export default function ConfirmationPage() {
                   ? `${booking.guest.firstName} ${booking.guest.lastName}`
                   : "Guest"
               }
-              paymentStatus={booking.paymentStatus}
+              paymentStatus={
+                stripeRedirectStatus === "succeeded" ? "PAID" : booking.paymentStatus
+              }
               amountPaid={booking.amountPaid}
             />
           </div>
