@@ -341,6 +341,7 @@ export default function RoomBookingPage() {
                         confirmationNumber={bookingConfirmationNumber!}
                         totalAmount={bookingTotal}
                         currency={bookingCurrency}
+                        guestEmail={guestData?.email ?? ""}
                         onSuccess={handlePaymentSuccess}
                       />
                     </Elements>

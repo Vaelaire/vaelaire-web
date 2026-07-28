@@ -8,10 +8,11 @@ interface PaymentFormProps {
   confirmationNumber: string;
   totalAmount: number;
   currency: string;
+  guestEmail: string;
   onSuccess: () => void;
 }
 
-export function PaymentForm({ confirmationNumber, totalAmount, currency, onSuccess }: PaymentFormProps) {
+export function PaymentForm({ confirmationNumber, totalAmount, currency, guestEmail, onSuccess }: PaymentFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
@@ -39,6 +40,9 @@ export function PaymentForm({ confirmationNumber, totalAmount, currency, onSucce
       elements,
       confirmParams: {
         return_url: `${window.location.origin}/book/confirmation/${confirmationNumber}`,
+        payment_method_data: {
+          billing_details: { email: guestEmail },
+        },
       },
       redirect: "if_required",
     });
