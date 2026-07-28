@@ -5,3 +5,4 @@ export { GuestDetailsForm } from "./GuestDetailsForm";
 export type { GuestFormData } from "./GuestDetailsForm";
 export { BookingSummary } from "./BookingSummary";
 export { BookingConfirmation } from "./BookingConfirmation";
+export { PaymentForm } from "./PaymentForm";

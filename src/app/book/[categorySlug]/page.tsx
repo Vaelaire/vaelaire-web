@@ -1,18 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useSearchParams, useRouter, useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Check } from "lucide-react";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { SiteHeader, SiteFooter } from "@/components/layout";
 import {
   GuestDetailsForm,
   BookingSummary,
+  PaymentForm,
   type GuestFormData,
 } from "@/components/booking";
 import { getBookingAdapter, type RoomAvailabilityResult } from "@/services/booking";
+import { graphqlClient } from "@/lib/graphql/client";
+import { CREATE_PAYMENT_INTENT } from "@/lib/graphql/mutations";
 
-type Step = "details" | "review";
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
+);
+
+type Step = "details" | "review" | "payment";
 
 export default function RoomBookingPage() {
   const params = useParams();
@@ -31,14 +40,23 @@ export default function RoomBookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch room data
+  // Payment state
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [bookingConfirmationNumber, setBookingConfirmationNumber] = useState<string | null>(null);
+  const [bookingTotal, setBookingTotal] = useState<number>(0);
+  const [bookingCurrency, setBookingCurrency] = useState<string>("NGN");
+
+  const stripeOptions = useMemo(
+    () => (clientSecret ? { clientSecret } : undefined),
+    [clientSecret]
+  );
+
   useEffect(() => {
     async function fetchRoomData() {
       try {
         setIsLoading(true);
         const adapter = getBookingAdapter();
 
-        // Get property first
         const property = await adapter.getDefaultProperty();
         if (!property) {
           setError("Property not found");
@@ -46,7 +64,6 @@ export default function RoomBookingPage() {
         }
         setPropertyId(property.id);
 
-        // Search availability to get room details
         const results = await adapter.searchAvailability({
           checkIn: new Date(checkIn),
           checkOut: new Date(checkOut),
@@ -92,8 +109,10 @@ export default function RoomBookingPage() {
 
     try {
       setIsSubmitting(true);
+      setError(null);
       const adapter = getBookingAdapter();
 
+      // Step 1: Create booking
       const result = await adapter.createBooking({
         propertyId,
         categoryId: roomData.categoryId,
@@ -111,17 +130,39 @@ export default function RoomBookingPage() {
         specialRequests: guestData.specialRequests,
       });
 
-      if (result.success && result.confirmationNumber) {
-        router.push(`/book/confirmation/${result.confirmationNumber}`);
-      } else {
+      if (!result.success || !result.bookingId || !result.confirmationNumber) {
         setError(result.error || "Failed to create booking");
         setIsSubmitting(false);
+        return;
       }
+
+      // Step 2: Create Stripe PaymentIntent
+      const intentResult = await graphqlClient
+        .mutation(CREATE_PAYMENT_INTENT, { bookingId: result.bookingId })
+        .toPromise();
+
+      if (intentResult.error || !intentResult.data?.createPaymentIntent?.clientSecret) {
+        setError("Failed to initialise payment. Please try again.");
+        setIsSubmitting(false);
+        return;
+      }
+
+      setClientSecret(intentResult.data.createPaymentIntent.clientSecret);
+      setBookingConfirmationNumber(result.confirmationNumber);
+      setBookingTotal(result.totalAmount ?? 0);
+      setBookingCurrency(result.currency ?? "NGN");
+      setStep("payment");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (err) {
       console.error("Error creating booking:", err);
-      setError("An error occurred while creating your booking");
+      setError("An error occurred. Please try again.");
+    } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = () => {
+    router.push(`/book/confirmation/${bookingConfirmationNumber}`);
   };
 
   const handleEditDetails = () => {
@@ -129,7 +170,19 @@ export default function RoomBookingPage() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Loading state
+  const nights = Math.ceil(
+    (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
+      (1000 * 60 * 60 * 24)
+  );
+
+  const stepConfig: { id: Step; label: string }[] = [
+    { id: "details", label: "Guest Details" },
+    { id: "review", label: "Review" },
+    { id: "payment", label: "Payment" },
+  ];
+
+  const stepIndex = stepConfig.findIndex((s) => s.id === step);
+
   if (isLoading) {
     return (
       <>
@@ -150,8 +203,7 @@ export default function RoomBookingPage() {
     );
   }
 
-  // Error state
-  if (error || !roomData) {
+  if (error && step === "details" && !roomData) {
     return (
       <>
         <SiteHeader />
@@ -179,10 +231,7 @@ export default function RoomBookingPage() {
     );
   }
 
-  const nights = Math.ceil(
-    (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
-      (1000 * 60 * 60 * 24)
-  );
+  if (!roomData) return null;
 
   return (
     <>
@@ -192,13 +241,15 @@ export default function RoomBookingPage() {
         {/* Header */}
         <section className="bg-midnight text-ivory py-8">
           <div className="max-w-content mx-auto px-4 sm:px-6 lg:px-8">
-            <Link
-              href={`/book/search?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`}
-              className="inline-flex items-center gap-2 text-ui-sm text-champagne hover:text-ivory transition-colors mb-4"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Back to results
-            </Link>
+            {step !== "payment" && (
+              <Link
+                href={`/book/search?checkIn=${checkIn}&checkOut=${checkOut}&guests=${guests}`}
+                className="inline-flex items-center gap-2 text-ui-sm text-champagne hover:text-ivory transition-colors mb-4"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Back to results
+              </Link>
+            )}
 
             <h1 className="font-editorial text-display-md lg:text-display-lg">
               {roomData.name}
@@ -206,37 +257,27 @@ export default function RoomBookingPage() {
 
             {/* Progress Steps */}
             <div className="mt-6 flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <span
-                  className={`flex items-center justify-center w-6 h-6 rounded-full text-ui-xs font-medium ${
-                    step === "details"
-                      ? "bg-champagne text-midnight"
-                      : "bg-green-600 text-white"
-                  }`}
-                >
-                  {step === "review" ? <Check className="w-4 h-4" /> : "1"}
-                </span>
-                <span className="text-ui-sm">Guest Details</span>
-              </div>
-              <div className="w-8 h-px bg-stone/40" />
-              <div className="flex items-center gap-2">
-                <span
-                  className={`flex items-center justify-center w-6 h-6 rounded-full text-ui-xs font-medium ${
-                    step === "review"
-                      ? "bg-champagne text-midnight"
-                      : "bg-stone/40 text-stone"
-                  }`}
-                >
-                  2
-                </span>
-                <span
-                  className={`text-ui-sm ${
-                    step === "review" ? "text-ivory" : "text-stone"
-                  }`}
-                >
-                  Review & Confirm
-                </span>
-              </div>
+              {stepConfig.map((s, i) => (
+                <div key={s.id} className="flex items-center gap-2">
+                  {i > 0 && <div className="w-8 h-px bg-stone/40" />}
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`flex items-center justify-center w-6 h-6 rounded-full text-ui-xs font-medium ${
+                        i < stepIndex
+                          ? "bg-green-600 text-white"
+                          : i === stepIndex
+                          ? "bg-champagne text-midnight"
+                          : "bg-stone/40 text-stone"
+                      }`}
+                    >
+                      {i < stepIndex ? <Check className="w-4 h-4" /> : i + 1}
+                    </span>
+                    <span className={`text-ui-sm ${i === stepIndex ? "text-ivory" : "text-stone"}`}>
+                      {s.label}
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
@@ -247,7 +288,7 @@ export default function RoomBookingPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2">
-                {step === "details" ? (
+                {step === "details" && (
                   <div className="bg-white p-6 lg:p-8">
                     <h2 className="font-editorial text-display-sm text-charcoal mb-6">
                       Guest Details
@@ -257,15 +298,19 @@ export default function RoomBookingPage() {
                       defaultValues={guestData || undefined}
                     />
                   </div>
-                ) : (
+                )}
+
+                {step === "review" && (
                   <div className="bg-white p-6 lg:p-8">
                     <h2 className="font-editorial text-display-sm text-charcoal mb-6">
                       Review Your Booking
                     </h2>
                     <p className="text-body-md text-stone mb-8">
-                      Please review your booking details below. Click
-                      &quot;Confirm Booking&quot; to complete your reservation.
+                      Please review your booking details below. You&apos;ll complete payment on the next step.
                     </p>
+                    {error && (
+                      <p className="mb-4 text-red-600 text-body-sm">{error}</p>
+                    )}
                     {guestData && (
                       <BookingSummary
                         roomName={roomData.name}
@@ -282,16 +327,34 @@ export default function RoomBookingPage() {
                     )}
                   </div>
                 )}
+
+                {step === "payment" && clientSecret && (
+                  <div className="bg-white p-6 lg:p-8">
+                    <h2 className="font-editorial text-display-sm text-charcoal mb-2">
+                      Complete Payment
+                    </h2>
+                    <p className="text-body-md text-stone mb-8">
+                      Your reservation is held. Complete payment to confirm your stay.
+                    </p>
+                    <Elements stripe={stripePromise} options={stripeOptions}>
+                      <PaymentForm
+                        confirmationNumber={bookingConfirmationNumber!}
+                        totalAmount={bookingTotal}
+                        currency={bookingCurrency}
+                        onSuccess={handlePaymentSuccess}
+                      />
+                    </Elements>
+                  </div>
+                )}
               </div>
 
-              {/* Sidebar - Room Summary */}
+              {/* Sidebar */}
               <div className="lg:col-span-1">
                 <div className="bg-white p-6 sticky top-24">
                   <h3 className="font-editorial text-display-xs text-charcoal mb-4">
                     Your Selection
                   </h3>
 
-                  {/* Room image */}
                   {roomData.imageUrls[0] && (
                     <div className="aspect-[4/3] bg-stone/10 mb-4 relative overflow-hidden">
                       <img
@@ -329,7 +392,7 @@ export default function RoomBookingPage() {
                     <div className="flex justify-between items-center">
                       <span className="text-body-md text-stone">Total</span>
                       <span className="font-editorial text-display-xs text-charcoal">
-                        {roomData.currency === "EUR" ? "€" : roomData.currency}
+                        {roomData.currency === "EUR" ? "€" : roomData.currency}{" "}
                         {roomData.price * nights}
                       </span>
                     </div>

@@ -1,5 +1,14 @@
 import { gql } from "urql";
 
+export const CREATE_PAYMENT_INTENT = gql`
+  mutation CreatePaymentIntent($bookingId: ID!) {
+    createPaymentIntent(bookingId: $bookingId) {
+      clientSecret
+      paymentIntentId
+    }
+  }
+`;
+
 export const CREATE_PUBLIC_BOOKING = gql`
   mutation CreatePublicBooking($input: CreatePublicBookingInput!) {
     createPublicBooking(input: $input) {
