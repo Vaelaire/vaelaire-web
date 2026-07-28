@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, Calendar, Users, Bed, Mail, Printer, Download } from "lucide-react";
+import { CheckCircle, Calendar, Users, Bed, Mail, Printer, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui";
 
 interface BookingConfirmationProps {
@@ -13,6 +13,8 @@ interface BookingConfirmationProps {
   currency: string;
   guestEmail: string;
   guestName: string;
+  paymentStatus?: string;
+  amountPaid?: number;
 }
 
 export function BookingConfirmation({
@@ -25,12 +27,16 @@ export function BookingConfirmation({
   currency,
   guestEmail,
   guestName,
+  paymentStatus,
+  amountPaid,
 }: BookingConfirmationProps) {
   const nights = Math.ceil(
     (new Date(checkOut).getTime() - new Date(checkIn).getTime()) /
       (1000 * 60 * 60 * 24)
   );
   const currencySymbol = currency === "EUR" ? "€" : currency;
+  const isPaid = paymentStatus === "PAID";
+  const isPartial = paymentStatus === "PARTIAL";
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
@@ -41,6 +47,9 @@ export function BookingConfirmation({
     });
   };
 
+  const formatAmount = (amount: number) =>
+    new Intl.NumberFormat("en-NG", { style: "currency", currency }).format(amount);
+
   const handlePrint = () => {
     window.print();
   };
@@ -48,12 +57,12 @@ export function BookingConfirmation({
   return (
     <div className="max-w-2xl mx-auto">
       {/* Success Header */}
-      <div className="text-center mb-8">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
+      <div className="text-center mb-8 print:mb-4">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4 print:hidden">
           <CheckCircle className="w-8 h-8 text-green-600" />
         </div>
         <h1 className="font-editorial text-display-md text-charcoal">
-          Booking Confirmed
+          {isPaid ? "Booking & Payment Confirmed" : "Booking Confirmed"}
         </h1>
         <p className="mt-2 text-body-lg text-stone">
           Thank you, {guestName}! Your reservation is confirmed.
@@ -128,23 +137,35 @@ export function BookingConfirmation({
           </div>
 
           <div className="flex items-start gap-4">
-            <div className="w-5" />
+            <CreditCard className="w-5 h-5 text-stone mt-0.5" />
             <div className="flex-1">
               <p className="text-ui-sm text-stone uppercase tracking-wider mb-2">
                 Total
               </p>
               <p className="font-editorial text-display-sm text-charcoal">
-                {currencySymbol}
-                {totalAmount}
+                {formatAmount(totalAmount)}
               </p>
-              <p className="text-body-sm text-stone">Payment due at check-in</p>
+              {isPaid && (
+                <span className="inline-flex items-center gap-1.5 mt-1 text-body-sm text-green-700 font-medium">
+                  <CheckCircle className="w-4 h-4" />
+                  Payment confirmed
+                </span>
+              )}
+              {isPartial && amountPaid != null && (
+                <p className="text-body-sm text-stone mt-1">
+                  {formatAmount(amountPaid)} paid · balance due at check-in
+                </p>
+              )}
+              {!isPaid && !isPartial && (
+                <p className="text-body-sm text-stone mt-1">Payment due at check-in</p>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Email Confirmation Notice */}
-      <div className="bg-stone/10 p-6 mb-8 flex items-start gap-4">
+      <div className="bg-stone/10 p-6 mb-8 flex items-start gap-4 print:hidden">
         <Mail className="w-5 h-5 text-stone mt-0.5 flex-shrink-0" />
         <div>
           <p className="text-body-md text-charcoal">
@@ -157,8 +178,14 @@ export function BookingConfirmation({
         </div>
       </div>
 
+      {/* Print-only footer */}
+      <div className="hidden print:block mb-6 text-body-sm text-stone border-t border-stone/20 pt-4">
+        <p>Guest: {guestName} · {guestEmail}</p>
+        <p className="mt-1">Vaelaire Lagos · Victoria Island, Lagos, Nigeria · reservations@stayatvaelaire.com</p>
+      </div>
+
       {/* Actions */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center print:hidden">
         <Button variant="secondary" onClick={handlePrint}>
           <Printer className="mr-2 w-4 h-4" />
           Print Confirmation
@@ -167,7 +194,7 @@ export function BookingConfirmation({
       </div>
 
       {/* Contact Info */}
-      <div className="mt-12 text-center text-body-sm text-stone">
+      <div className="mt-12 text-center text-body-sm text-stone print:hidden">
         <p>
           Questions about your reservation?{" "}
           <a

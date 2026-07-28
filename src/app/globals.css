@@ -74,3 +74,17 @@
     scroll-behavior: smooth;
   }
 }
+
+/* Print styles — hide chrome, show only confirmation content */
+@media print {
+  header, footer, nav {
+    display: none !important;
+  }
+  main {
+    padding-top: 0 !important;
+    background: white !important;
+  }
+  body {
+    background: white !important;
+  }
+}

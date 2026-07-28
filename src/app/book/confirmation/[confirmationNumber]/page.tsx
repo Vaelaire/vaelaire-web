@@ -125,6 +125,8 @@ export default function ConfirmationPage() {
                   ? `${booking.guest.firstName} ${booking.guest.lastName}`
                   : "Guest"
               }
+              paymentStatus={booking.paymentStatus}
+              amountPaid={booking.amountPaid}
             />
           </div>
         </section>
