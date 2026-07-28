@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EB_Garamond, Inter } from "next/font/google";
+import { GraphQLProvider } from "@/providers/GraphQLProvider";
 import "./globals.css";
 
 const ebGaramond = EB_Garamond({
@@ -64,7 +65,7 @@ export default function RootLayout({
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        {children}
+        <GraphQLProvider>{children}</GraphQLProvider>
       </body>
     </html>
   );
