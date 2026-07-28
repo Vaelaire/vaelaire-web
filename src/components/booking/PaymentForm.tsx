@@ -29,13 +29,6 @@ export function PaymentForm({ confirmationNumber, totalAmount, currency, guestEm
     setIsProcessing(true);
     setError(null);
 
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      setError(submitError.message ?? "Payment failed");
-      setIsProcessing(false);
-      return;
-    }
-
     const { error: confirmError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -44,16 +37,13 @@ export function PaymentForm({ confirmationNumber, totalAmount, currency, guestEm
           billing_details: { email: guestEmail },
         },
       },
-      redirect: "if_required",
     });
 
+    // Only reaches here if there was an error — success always redirects
     if (confirmError) {
       setError(confirmError.message ?? "Payment failed");
       setIsProcessing(false);
-      return;
     }
-
-    onSuccess();
   };
 
   return (
